@@ -1,0 +1,29 @@
+{
+  "descriptionHash": "AEB1820F7260DAF1267E0A768B496C1131C812BFD7BDFFBCC9C12ADDF1AEADDB8760999E88DAB2D44F21F4ECF4152A639909FF657020EDDA7ED6D2E0DA73C031",
+  "descriptionLocation": "https://cdn.jsdelivr.net/npm/@lunch-money/v2-api-spec@latest/lunch-money-api-v2.yaml",
+  "lockFileVersion": "1.0.0",
+  "kiotaVersion": "1.38.0",
+  "clientClassName": "LunchMoneyClient",
+  "typeAccessModifier": "Public",
+  "clientNamespaceName": "LunchMoney.Sdk",
+  "language": "CSharp",
+  "usesBackingStore": true,
+  "excludeBackwardCompatible": true,
+  "includeAdditionalData": false,
+  "disableSSLValidation": false,
+  "serializers": [
+    "Microsoft.Kiota.Serialization.Json.JsonSerializationWriterFactory",
+    "Microsoft.Kiota.Serialization.Multipart.MultipartSerializationWriterFactory"
+  ],
+  "deserializers": [
+    "Microsoft.Kiota.Serialization.Json.JsonParseNodeFactory"
+  ],
+  "structuredMimeTypes": [
+    "application/json",
+    "multipart/form-data;q=0.1"
+  ],
+  "includePatterns": [],
+  "excludePatterns": [],
+  "disabledValidationRules": [],
+  "allowedExternalOrigins": []
+}

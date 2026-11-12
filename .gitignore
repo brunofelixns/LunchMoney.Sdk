@@ -1,0 +1,19 @@
+# .NET and IDE output
+**/bin/
+**/obj/
+.vs/
+.idea/
+.vscode/
+*.user
+*.suo
+TestResults/
+artifacts/
+.superpowers/
+
+# Local credentials and environment overrides
+.env
+.env.*
+!.env.example
+NuGet.Config.local
+*.pfx
+*.snk

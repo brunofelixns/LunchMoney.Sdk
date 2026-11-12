@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="LunchMoney.Sdk.csproj" />
+  <Folder Name="/tests/">
+    <Project Path="tests/LunchMoney.Sdk.Tests/LunchMoney.Sdk.Tests.csproj" />
+  </Folder>
+</Solution>

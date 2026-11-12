@@ -1,0 +1,41 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net11.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Version>0.1.0</Version>
+    <PackageId>LunchMoney.Sdk</PackageId>
+    <Authors>Bruno Felix</Authors>
+    <Description>A typed .NET client for the Lunch Money v2 API, with dependency injection, HttpClientFactory integration and a factory for background services.</Description>
+    <PackageTags>lunchmoney;finance;budgeting;api;kiota;httpclient</PackageTags>
+    <PackageProjectUrl>https://github.com/brunofelixns/LunchMoney.Sdk</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/brunofelixns/LunchMoney.Sdk</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <Copyright>Copyright (c) 2026 Bruno Felix</Copyright>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Http" Version="11.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="11.0.0" />
+    <PackageReference Include="Microsoft.Kiota.Bundle" Version="2.1.6" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="tests\**\*.cs" />
+    <None Remove="tests\**" />
+    <None Update="README.md" Pack="true" PackagePath="/" />
+    <None Update="LICENSE" Pack="true" PackagePath="/" />
+    <None Update="THIRD-PARTY-NOTICES.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
+
+</Project>
