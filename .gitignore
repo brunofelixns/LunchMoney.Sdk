@@ -9,6 +9,7 @@
 TestResults/
 artifacts/
 .superpowers/
+/docs/superpowers/
 
 # Local credentials and environment overrides
 .env

@@ -80,6 +80,7 @@ regeneration preserves it.
 | Resilient worker example | [Background services](https://github.com/brunofelixns/LunchMoney.Sdk/blob/main/docs/en/background-services.md) | [Segundo plano](https://github.com/brunofelixns/LunchMoney.Sdk/blob/main/docs/es/background-services.md) |
 | Errors, retries and cancellation | [Error handling](https://github.com/brunofelixns/LunchMoney.Sdk/blob/main/docs/en/error-handling.md) | [Errores](https://github.com/brunofelixns/LunchMoney.Sdk/blob/main/docs/es/error-handling.md) |
 | Kiota, tests, CI and releases | [Development](https://github.com/brunofelixns/LunchMoney.Sdk/blob/main/docs/en/development.md) | [Desarrollo](https://github.com/brunofelixns/LunchMoney.Sdk/blob/main/docs/es/development.md) |
+| Design decisions and code boundaries | [Architecture](https://github.com/brunofelixns/LunchMoney.Sdk/blob/main/docs/en/architecture.md) | [Arquitectura](https://github.com/brunofelixns/LunchMoney.Sdk/blob/main/docs/es/architecture.md) |
 
 ## License and support
 

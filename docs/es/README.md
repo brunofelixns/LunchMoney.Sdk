@@ -80,6 +80,7 @@ limitada al host y el middleware de Kiota. El código de integración está fuer
 | [Servicios en segundo plano](background-services.md) | Worker completo con recuperación, esperas y apagado ordenado. |
 | [Gestión de errores](error-handling.md) | Errores HTTP, reintentos, timeout y cancelación. |
 | [Desarrollo](development.md) | Kiota, compilación, tests, CI, empaquetado y publicación. |
+| [Arquitectura](architecture.md) | Ciclos de vida HTTP, factory para servicios en segundo plano y separación del código generado. |
 
 Cada guía tiene un enlace a su versión en inglés. El inglés es el idioma principal;
 mantén ambas versiones y sus ejemplos de código sincronizados al modificarlas.
@@ -95,5 +96,5 @@ mantén ambas versiones y sus ejemplos de código sincronizados al modificarlas.
 
 SDK comunitario con [licencia MIT](../../LICENSE), independiente de Lunch Money y
 Microsoft. Consulta los [avisos de terceros](../../THIRD-PARTY-NOTICES.md) para los
-recursos de marca y las licencias de dependencias. Las notas de la imagen y los
-planes internos se mantienen separados de las guías de uso traducidas.
+recursos de marca y las licencias de dependencias. Las notas de la imagen se
+mantienen separadas de las guías de uso traducidas.

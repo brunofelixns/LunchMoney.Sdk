@@ -13,6 +13,7 @@ matches your application's lifetime. Both use the same registration.
 | [Background services](en/background-services.md) | A complete worker with recovery, backoff and graceful shutdown. |
 | [Error handling](en/error-handling.md) | HTTP errors, retries, timeouts and cancellation. |
 | [Development](en/development.md) | Kiota regeneration, build/test, CI, packing and release publishing. |
+| [Architecture](en/architecture.md) | HTTP lifetimes, the background-service factory and the generated-code boundary. |
 
 Every guide has a matching Spanish version and a language link at the top.
 English is the primary documentation language. Keep both versions and their
@@ -29,5 +30,4 @@ executable examples in sync when making changes.
 
 The SDK uses the [MIT license](../LICENSE). It is independent of Lunch Money and
 Microsoft; see [third-party notices](../THIRD-PARTY-NOTICES.md) for brand assets
-and dependency licenses. Artwork notes and internal implementation plans live in
-separate folders and are not part of the translated consumer guides.
+and dependency licenses. Artwork notes live separately from the translated guides.
