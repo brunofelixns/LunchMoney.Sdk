@@ -113,7 +113,10 @@ isolated disposable account.
 
 The suite currently has 48 success contracts and 17 explicit error contracts.
 Updates to shared fixtures send their existing values; tag updates/deletes use
-uniquely named owned tags. Creation cases register cleanup in `finally`; cleanup
+uniquely named owned tags. The balance-history update discovers a manual account
+with a stored historical entry and preserves its month, balance and currency;
+it does not assume a fixed demo account still has historical data.
+Creation cases register cleanup in `finally`; cleanup
 reads back the resource and checks ownership before deleting it, tolerating a
 404 when the mock did not persist it. No test depends on another test's writes.
 

@@ -120,6 +120,9 @@ Los datos del mock público son compartidos; no es una cuenta desechable aislada
 La suite contiene actualmente 48 contratos de éxito y 17 de error explícito.
 Las actualizaciones de recursos compartidos envían sus valores actuales; las
 ediciones y borrados de etiquetas usan etiquetas propias con nombre único.
+La actualización del histórico busca una cuenta manual con una entrada guardada
+y conserva su mes, saldo y moneda; no presupone que una cuenta fija del mock siga
+teniendo datos históricos.
 Las altas registran su limpieza en `finally`; antes de borrar, la limpieza
 consulta el recurso y comprueba que pertenece al caso. Admite un 404 cuando el
 mock no guardó el alta. Ningún test depende de las escrituras de otro test.

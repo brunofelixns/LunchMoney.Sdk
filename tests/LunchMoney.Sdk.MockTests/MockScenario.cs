@@ -16,6 +16,7 @@ internal sealed class MockScenario(LunchMoneyClient client) : IAsyncDisposable
     public int CategoryId => 315162;
     public int TagId { get; private set; } = 94319;
     public int ManualId => 219807;
+    public int BalanceHistoryManualId { get; private set; } = 219807;
     public int CryptoId => 22001;
     public int DeletedId => 91;
     public int FileId => 1234567890;
@@ -72,13 +73,19 @@ internal sealed class MockScenario(LunchMoneyClient client) : IAsyncDisposable
                 break;
             case "/balance_history/{account_type}/{account_id}":
             case "/balance_history/crypto_synced/{account_id}/{symbol}":
-                var current = operation.Route.Contains("crypto_synced", StringComparison.Ordinal)
+                var isSyncedCrypto = operation.Route.Contains("crypto_synced", StringComparison.Ordinal);
+                var current = isSyncedCrypto
                     ? await Client.Balance_history.Crypto_synced[33004]["btc"].GetAsync(cancellationToken: token)
-                    : await Client.Balance_history["manual"][ManualId].GetAsync(cancellationToken: token);
+                    : await Client.Balance_history.GetAsync(cancellationToken: token);
                 using (var parsed = ToJson(current!))
                 {
-                    var entry = parsed.RootElement.GetProperty("balance_history")[0].GetProperty("balances").EnumerateArray().First(row => row.GetProperty("type").GetString() == "historical");
+                    var account = parsed.RootElement.GetProperty("balance_history").EnumerateArray().First(row =>
+                        (isSyncedCrypto || row.GetProperty("source").GetProperty("type").GetString() == "manual")
+                        && row.GetProperty("balances").EnumerateArray().Any(balance => balance.GetProperty("type").GetString() == "historical"));
+                    if (!isSyncedCrypto) BalanceHistoryManualId = account.GetProperty("source").GetProperty("manual_account_id").GetInt32();
+                    var entry = account.GetProperty("balances").EnumerateArray().First(row => row.GetProperty("type").GetString() == "historical");
                     Dictionary<string, string?> value = new() { ["month"] = entry.GetProperty("month").GetString(), ["balance"] = entry.GetProperty("balance").GetString() };
+                    if (entry.TryGetProperty("currency", out var currency) && currency.ValueKind == JsonValueKind.String) value["currency"] = currency.GetString();
                     if (entry.TryGetProperty("crypto_balance", out var crypto) && crypto.ValueKind == JsonValueKind.String) value["crypto_balance"] = crypto.GetString();
                     RequestJson = JsonSerializer.Serialize(new { balances = new[] { value } });
                 }
@@ -87,6 +94,7 @@ internal sealed class MockScenario(LunchMoneyClient client) : IAsyncDisposable
     }
 
     public string ResolvePath(string route) => route.Replace("{category}", CategoryId.ToString(), StringComparison.Ordinal)
+        .Replace("{balanceHistoryManual}", BalanceHistoryManualId.ToString(), StringComparison.Ordinal)
         .Replace("{tag}", TagId.ToString(), StringComparison.Ordinal).Replace("{manual}", ManualId.ToString(), StringComparison.Ordinal)
         .Replace("{crypto}", CryptoId.ToString(), StringComparison.Ordinal).Replace("{deleted}", DeletedId.ToString(), StringComparison.Ordinal)
         .Replace("{file}", FileId.ToString(), StringComparison.Ordinal).Replace("{transaction}", TransactionId.ToString(), StringComparison.Ordinal);
