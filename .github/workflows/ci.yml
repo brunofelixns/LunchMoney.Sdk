@@ -71,3 +71,40 @@ jobs:
             artifacts/packages/*.snupkg
           if-no-files-found: error
           retention-days: 14
+
+  official-mock:
+    name: Official mock (all SDK operations)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6
+        with:
+          global-json-file: global.json
+          cache: true
+          cache-dependency-path: |
+            packages.lock.json
+            tests/LunchMoney.Sdk.MockTests/packages.lock.json
+
+      - name: Restore locked mock test dependencies
+        run: dotnet restore tests/LunchMoney.Sdk.MockTests/LunchMoney.Sdk.MockTests.csproj --locked-mode
+
+      - name: Build mock tests
+        run: dotnet build tests/LunchMoney.Sdk.MockTests/LunchMoney.Sdk.MockTests.csproj --configuration Release --no-restore -warnaserror
+
+      - name: Exercise all SDK operations against the official mock
+        run: dotnet test tests/LunchMoney.Sdk.MockTests/LunchMoney.Sdk.MockTests.csproj --configuration Release --no-build --no-restore --logger "trx;LogFileName=official-mock.trx" --results-directory MockTestResults
+
+      - name: Upload official mock test results
+        if: ${{ always() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: test-results-official-mock
+          path: MockTestResults/*.trx
+          if-no-files-found: warn
+          retention-days: 14

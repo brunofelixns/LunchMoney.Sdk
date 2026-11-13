@@ -43,15 +43,17 @@ dotnet test tests/LunchMoney.Sdk.Tests/LunchMoney.Sdk.Tests.csproj -c Release --
 dotnet pack LunchMoney.Sdk.csproj -c Release --no-build --no-restore -o artifacts/packages
 ```
 
-The integration tests use an in-memory HTTP transport and synthetic tokens. They
+The default solution's integration tests use an in-memory HTTP transport and synthetic tokens. They
 do not call Lunch Money. Error coverage exercises both injection styles, including
 mapped/unmapped responses, malformed error JSON, retry recovery and exhaustion,
 `Retry-After` seconds/dates, connection failure, timeout and cancellation before or
 during HTTP and during retry delays.
 
 `global.json` selects .NET SDK `11.0.100` with servicing patch updates allowed.
-Commit both `packages.lock.json` files. After intentionally changing dependencies,
+Commit each project's `packages.lock.json`. After intentionally changing dependencies,
 run `dotnet restore LunchMoney.Sdk.slnx --force-evaluate` and review the lock-file diff.
+Also run `dotnet restore tests/LunchMoney.Sdk.MockTests/LunchMoney.Sdk.MockTests.csproj --force-evaluate`
+to update the opt-in mock project's lock file, which the solution does not include.
 
 ## CI and packages
 
@@ -61,9 +63,78 @@ and packing on Windows and Linux for pushes to `main`, pull requests and manual
 runs. Each successful job uploads a `.nupkg`, a `.snupkg` and a test report.
 Artifacts expire after 14 days. No Lunch Money token is needed.
 
+A separate `official-mock` job runs the network suite below on Linux. It uploads
+`test-results-official-mock` and must pass before NuGet publishing can proceed.
+
 The NuGet package includes the README, MIT license, third-party notices and XML
 API documentation. The symbol package contains portable PDBs; builds from a Git
 checkout use the .NET SDK's built-in Source Link support for source debugging.
+
+## Official mock integration tests
+
+The opt-in project `tests/LunchMoney.Sdk.MockTests` has one independent case for
+each of the SDK's 65 HTTP operations, including JSON writes, deletes and multipart
+attachment uploads. A reflection-based coverage test fails if regeneration adds
+an operation without a case, or a case is duplicated. Additional checks reject
+destinations outside the official HTTPS mock.
+
+Run from the repository root:
+
+```powershell
+dotnet restore tests/LunchMoney.Sdk.MockTests/LunchMoney.Sdk.MockTests.csproj --locked-mode
+dotnet test tests/LunchMoney.Sdk.MockTests/LunchMoney.Sdk.MockTests.csproj -c Release --no-restore --logger "trx;LogFileName=official-mock.trx" --results-directory artifacts/mock-tests
+```
+
+The project is deliberately outside `LunchMoney.Sdk.slnx`, so the default
+solution and offline test command do not contact external services. CI invokes
+it explicitly on pushes, pull requests and manual runs.
+
+The suite fixes its destination to `https://mock.lunchmoney.dev/v2` and creates a
+synthetic token. It does not read API credentials or endpoint overrides from the
+environment. It uses the normal `AddLunchMoney` registration, SDK factory and
+Kiota middleware, sends requests sequentially at least four seconds apart,
+and bounds each operation to 90 seconds. Allow several minutes for a full run.
+Kiota handles transient retries; HTTP errors, timeouts, network outages and
+assertion failures fail the suite rather than silently skipping cases. Expected
+HTTP errors are declared per case and shown in its test name; they must match
+the expected status and generated exception type.
+
+Each case checks the actual HTTP method, path and expected status. JSON request
+fields are compared with the wire payload, and representative response fields
+are checked after deserialization into generated SDK models. No-content operations
+and multipart uploads have their own assertions. Fixtures come from the official
+v2.11.2 OpenAPI examples and should be reviewed when regenerating the client.
+
+The [official documentation](https://lunchmoney.dev/introduction) describes a static
+mock. Probes on 2026-11-13 observed mixed behavior: tag writes persisted across
+synthetic tokens, while category/manual-account creates returned IDs that could
+not subsequently be read. Treat the public mock's data as shared, not as an
+isolated disposable account.
+
+The suite currently has 48 success contracts and 17 explicit error contracts.
+Updates to shared fixtures send their existing values; tag updates/deletes use
+uniquely named owned tags. Creation cases register cleanup in `finally`; cleanup
+reads back the resource and checks ownership before deleting it, tolerating a
+404 when the mock did not persist it. No test depends on another test's writes.
+
+To avoid removing shared demo resources, most DELETE cases use absent IDs and
+expect 404 (budget deletion expects 400). Group/split/upload writes and budget
+upserts also use invalid IDs; cryptocurrency creation checks an existing coin's
+422 conflict. These cover SDK requests and error deserialization, not successful
+CRUD for those operations. The mock currently returns an HTML 404 for
+`DELETE /transactions/group/{id}`; that case explicitly checks `ApiException`
+propagation and is a mock limitation, not evidence that ungrouping works.
+
+Real account authentication, business rules and full CRUD persistence require a
+separate test budget. Deterministic error, retry and cancellation scenarios stay
+in the offline suite. A public mock outage fails only its CI job, leaving the
+offline job's results visible. Both suites are release checks.
+
+To run only inventory, destination and ownership checks without network calls:
+
+```powershell
+dotnet test tests/LunchMoney.Sdk.MockTests/LunchMoney.Sdk.MockTests.csproj -c Release --filter "Category!=OfficialMock"
+```
 
 ## Publishing a release
 
