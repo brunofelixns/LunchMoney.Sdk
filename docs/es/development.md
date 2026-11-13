@@ -147,12 +147,30 @@ dotnet test tests/LunchMoney.Sdk.MockTests/LunchMoney.Sdk.MockTests.csproj -c Re
 
 ## Publicar una versión
 
-La CI valida y genera los paquetes. Para publicarlos, elige la versión en
-`LunchMoney.Sdk.csproj`, integra el commit y verifica su CI. Descarga el artefacto
-de paquetes de uno de los jobs correctos. Publica el `.nupkg` desde la página de
-subida de NuGet.org o con `dotnet nuget push` y tus propias credenciales. El
-`.snupkg` permite publicar los símbolos. Las versiones no se pueden sobrescribir
-en NuGet.org; conserva el commit exacto utilizado para cada versión.
+La CI publica automáticamente en NuGet.org cuando los jobs de Windows, Linux y mock oficial
+terminan correctamente en `main`. Descarga el paquete validado del job de Linux y
+publica el `.nupkg` y su `.snupkg`, sin recompilar. Las pull requests y las
+ejecuciones en otras ramas no pueden publicar. Los commits nuevos no cancelan las
+ejecuciones de `main`, para permitir que una publicación en curso termine.
+
+La autenticación utiliza [Trusted Publishing de NuGet](https://learn.microsoft.com/en-us/nuget/nuget-org/trusted-publishing)
+con OIDC de GitHub y una API key válida durante una hora. No se guarda una API key
+permanente en GitHub. Configuración inicial:
+
+1. Crea en GitHub un entorno llamado `nuget` y limita sus ramas de despliegue a
+   `main`.
+2. En NuGet.org, crea una política de Trusted Publishing con propietario del
+   repositorio `brunofelixns`, repositorio `LunchMoney.Sdk`, archivo de workflow
+   `ci.yml` y entorno `nuget`. Permite publicar paquetes nuevos y nuevas versiones,
+   limitando el alcance al identificador `LunchMoney.Sdk`.
+3. Define la variable de repositorio de GitHub Actions `NUGET_USER` con el nombre
+   de usuario de la cuenta de NuGet.org (no su correo electrónico).
+
+Para publicar una versión nueva, actualiza `Version` en `LunchMoney.Sdk.csproj` y
+sube o integra el cambio en `main`. La versión inicial es `0.1.0`. Las versiones de
+NuGet.org no se pueden sobrescribir; las subidas de una versión existente se
+omiten. Puedes reintentar la publicación ejecutando manualmente el workflow `CI`
+sobre `main`.
 
 El README compartido utiliza URL absolutas de GitHub y dominios de imágenes
 admitidos por NuGet.org. Mantén la documentación enlazada y la cabecera

@@ -138,12 +138,29 @@ dotnet test tests/LunchMoney.Sdk.MockTests/LunchMoney.Sdk.MockTests.csproj -c Re
 
 ## Publishing a release
 
-The CI validates and packages the SDK. To publish a release, choose the version in
-`LunchMoney.Sdk.csproj`, merge and verify that commit's CI, then download one
-successful job's package artifact. Publish the `.nupkg` using NuGet.org's upload
-page or `dotnet nuget push` with your own publishing credentials. The companion
-`.snupkg` enables symbol publishing. Package versions cannot be overwritten on
-NuGet.org; retain the exact commit used to build each release.
+The CI automatically publishes to NuGet.org after the Windows, Linux and official mock jobs
+succeed on `main`. It downloads the Linux job's validated package and publishes
+the `.nupkg` and its companion `.snupkg`, without rebuilding. Pull requests and
+runs on other branches cannot publish. Runs on `main` are not cancelled by newer
+commits, so a publish already in progress can finish.
+
+Authentication uses [NuGet Trusted Publishing](https://learn.microsoft.com/en-us/nuget/nuget-org/trusted-publishing)
+with GitHub OIDC and an API key valid for one hour. No long-lived API key is stored
+in GitHub. One-time setup:
+
+1. Create a GitHub environment named `nuget` and restrict its deployment branches
+   to `main`.
+2. In NuGet.org, create a Trusted Publishing policy for repository owner
+   `brunofelixns`, repository `LunchMoney.Sdk`, workflow file `ci.yml` and environment
+   `nuget`. Allow publishing new packages and new versions, scoped to package ID
+   `LunchMoney.Sdk`.
+3. Set the GitHub Actions repository variable `NUGET_USER` to the NuGet.org account's
+   username (not its email address).
+
+To release a new version, update `Version` in `LunchMoney.Sdk.csproj` and push or
+merge the change into `main`. The initial version is `0.1.0`. NuGet.org versions
+cannot be overwritten; pushes with an existing version are skipped. You can
+retry publishing by running the `CI` workflow manually on `main`.
 
 The shared README uses absolute GitHub URLs and image hosts supported by
 NuGet.org. Keep the linked documentation and banner available on `main`.
